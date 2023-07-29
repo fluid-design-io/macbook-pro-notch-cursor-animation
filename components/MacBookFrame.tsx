@@ -188,11 +188,9 @@ function MacBookFrame() {
               backgroundPosition: "center",
             }}
             initial={{
-              scale: 1,
               opacity: 0,
             }}
             animate={{
-              scale: 1.05,
               opacity: 1,
             }}
             transition={{

@@ -2,7 +2,7 @@
 
 import useMousePosition from "@/hooks/useMousePosition";
 import InteractiveScreen from "./InteractiveScreen";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import useElementDistance from "@/hooks/useElementDistance";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import Notch from "./Notch";
@@ -11,6 +11,7 @@ import MacBody from "./MacBody";
 
 function MacBookFrame() {
   const [devMode, setDevMode] = useState(false);
+  const [isSafari, setIsSafari] = useState(false);
   const refContainer = useRef<HTMLDivElement>(null);
   const refNotch = useRef<any>(null);
   const { x, y } = useMousePosition(refContainer);
@@ -62,8 +63,13 @@ function MacBookFrame() {
       bottom: 0,
     };
   }, [distance, x, y]);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsSafari(/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
+    }
+  }, []);
   return (
-    <div className='w-full h-full flex flex-col justify-center items-stretch max-w-5xl mx-auto'>
+    <div className='w-full h-full flex flex-col justify-center items-stretch max-w-5xl mx-auto min-w-[24rem]'>
       <div className='p-8 md:p-12 lg:p-16 pb-0 md:pb-0 lg:pb-0 w-full !cursor-none'>
         <motion.div
           className='aspect-[1.56/1] bg-black w-full h-full rounded-t-[2.125rem] border-[1rem] border-zinc-800 dark:border-zinc-900 relative !overflow-hidden'
@@ -157,11 +163,9 @@ function MacBookFrame() {
             </motion.div>
           </div>
           {/* Fake Clock Widget */}
-          <motion.div
-            className='absolute top-10 right-2 w-28 h-28 z-[8] bg-cover bg-center bg-no-repeat'
-            style={{
-              background: `url('/images/clock.png')`,
-            }}
+          <motion.img
+            className='absolute top-10 right-2 w-28 h-28 z-[8] object-contain'
+            src='/images/clock.png'
             initial={{
               scale: 0.95,
               opacity: 0,
@@ -221,10 +225,16 @@ function MacBookFrame() {
       </div>
       {/* Mac Body */}
       <MacBody className='-mt-1' />
+      {/* Filter */}
       <svg className='w-0 h-0'>
         <filter id='gooey'>
-          <feGaussianBlur in='SourceGraphic' stdDeviation='3' />
-          <feColorMatrix values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1500 -150' />
+          {/* Disable effect on Safari */}
+          {!isSafari && (
+            <>
+              <feGaussianBlur in='SourceGraphic' stdDeviation='3' />
+              <feColorMatrix values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1500 -150' />
+            </>
+          )}
         </filter>
       </svg>
     </div>

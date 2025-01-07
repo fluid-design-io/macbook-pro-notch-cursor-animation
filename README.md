@@ -2,6 +2,10 @@
 
 A delightful implementation of cursor interactions with the MacBook notch, enhancing user experience through visual feedback and playful animations.
 
+
+https://github.com/user-attachments/assets/73a092f6-e059-492f-95cc-fa73277d1841
+
+
 <Callout type="info">
 This project demonstrates how thoughtful UI interactions can improve both user experience and accessibility, while adding a touch of delight to everyday interactions.
 </Callout>

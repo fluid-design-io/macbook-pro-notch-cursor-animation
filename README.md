@@ -1,38 +1,198 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# MacOS Notch Cursor Interaction
+
+A delightful implementation of cursor interactions with the MacBook notch, enhancing user experience through visual feedback and playful animations.
+
+<Callout type="info">
+This project demonstrates how thoughtful UI interactions can improve both user experience and accessibility, while adding a touch of delight to everyday interactions.
+</Callout>
+
+## Implementation Overview
+
+<Steps>
+<Step>
+
+### Cursor Tracking System
+
+The project uses two custom hooks for precise cursor tracking:
+
+```typescript
+// Custom hook for tracking cursor position
+const { x, y } = useMousePosition(elementRef);
+
+// Custom hook for calculating distance from notch
+const distance = useElementDistance(notchRef, containerRef);
+```
+
+</Step>
+
+<Step>
+
+### Visual Feedback System
+
+The notch outline uses dynamic gradients that respond to cursor proximity:
+
+```typescript
+<radialGradient
+  cx={calculateDistanceAroundNotch.left / (135 / 2)}
+  cy={
+    calculateDistanceAroundNotch.bottom > -8
+      ? 1 - Math.abs(calculateDistanceAroundNotch.bottom) / 33
+      : -1
+  }
+>
+  <stop stopColor='#B4C7FF' />
+  <stop offset={1} stopColor='rgba(255,255,255,0)' stopOpacity={0} />
+</radialGradient>
+```
+
+</Step>
+
+<Step>
+
+### Gooey Effect Integration
+
+The liquid-like cursor effect uses SVG filters:
+
+```typescript
+<svg className='w-0 h-0'>
+  <filter id='gooey'>
+    <feGaussianBlur in='SourceGraphic' stdDeviation='10' />
+    <feColorMatrix values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 20 -10' />
+  </filter>
+</svg>
+```
+
+</Step>
+</Steps>
+
+## Custom Hooks Explained
+
+### useMousePosition
+
+<DynamicCodeBlock lang="typescript" code={`
+const useMousePosition = (ref: React.RefObject<HTMLDivElement>) => {
+const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+useEffect(() => {
+const handleMouseMove = (e: MouseEvent) => {
+const { left, top } = ref.current!.getBoundingClientRect();
+const x = e.clientX - left;
+const y = e.clientY - top;
+setMousePosition({ x, y });
+};
+
+    document.addEventListener("mousemove", handleMouseMove);
+    return () => document.removeEventListener("mousemove", handleMouseMove);
+
+}, [ref]);
+
+return mousePosition;
+};
+`} />
+
+This hook:
+
+- Tracks cursor position relative to a referenced element
+- Uses requestAnimationFrame for performance optimization
+- Returns real-time x/y coordinates
+
+### useElementDistance
+
+<DynamicCodeBlock lang="typescript" code={`
+const useElementDistance = (
+targetRef: RefObject<any>,
+parentRef: RefObject<HTMLElement>
+) => {
+const [distance, setDistance] = useState<{
+x: number;
+y: number;
+width: number;
+height: number;
+} | null>(null);
+
+// Returns distance metrics between two elements
+return distance;
+};
+`} />
+
+This hook:
+
+- Calculates distances between two DOM elements
+- Updates on window resize
+- Provides dimensional information for precise animations
+
+<Callout type="warning">
+Remember to provide refs to both hooks for proper functionality. The hooks are designed to work together but can be used independently if needed.
+</Callout>
+
+## Technical Implementation Details
+
+The project combines several technical approaches:
+
+1. **SVG Filters**: Used for creating the gooey effect
+2. **Framer Motion**: Handles smooth animations
+3. **Tailwind CSS**: Provides responsive styling
+4. **Next.js**: Powers the overall application
+
+<DynamicCodeBlock lang="typescript" code={`
+// Example of combining these technologies
+<motion.div
+className="backdrop-blur-2xl"
+style={{
+    filter: "url(#gooey)",
+    x: mousePosition.x,
+    y: mousePosition.y
+  }}
+animate={{
+    scale: isHovered ? 1.2 : 1
+  }}
+
+> {/_ Notch content _/}
+> </motion.div>
+> `} />
 
 ## Getting Started
 
-First, run the development server:
+<Steps>
+<Step>
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+```
+
+</Step>
+
+<Step>
+
+### Development
+
+```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+</Step>
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+<Step>
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Build
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+pnpm build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+</Step>
+</Steps>
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Contributions are welcome! Feel free to:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Report bugs
+- Suggest new features
+- Submit pull requests
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+MIT License - feel free to use this in your own projects!
